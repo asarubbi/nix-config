@@ -22,6 +22,12 @@ in
       tree-sitter
       curl
 
+      ripgrep
+      
+      ghostscript
+      mermaid-cli
+      tectonic
+
     ];
   };
 
