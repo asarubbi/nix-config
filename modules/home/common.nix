@@ -13,6 +13,7 @@
   home.stateVersion = "25.11";
   home.packages = with pkgs; [
     git
+    gh
     btop
     tmux
     fzf
