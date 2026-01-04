@@ -40,5 +40,21 @@
         }
       ];
     };
+
+    nixosConfigurations.pc2 = nixpkgs.lib.nixosSystem {
+      system = { inherit inputs;  };
+      specialArgs = { inherit inputs;  };
+      modules = [
+        ./hosts/pc0/configuration.nix
+        ./system/gnome.nix
+        home-manager.nixosModules.home-manager {
+          home-manager.extraSpecialArgs = {
+            username = "adsbvm";
+            homeDirectory = "/home/adsbvm";
+          };
+          home-manager.users.adsbvm = import ./modules/home/common.nix;
+        }
+      ];
+    };
   };
 }
