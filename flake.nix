@@ -56,5 +56,21 @@
         }
       ];
     };
+
+    homeConfigurations."adsbvm" = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.x86_64-linux; # Mint is 64-bit Linux
+      extraSpecialArgs = { inherit inputs; };
+      modules = [
+        ./modules/home/common.nix # Your shared Zsh, Neovim, etc.
+        {
+          home = {
+            username = "adsbvm";
+            homeDirectory = "/home/adsbvm";
+            stateVersion = "25.11";
+          };
+        }
+      ];
+    };
+
   };
 }
