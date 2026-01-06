@@ -108,6 +108,7 @@
         hostname = "devbox";
         username = "adsbvm"; # A new user for the devbox
         modules = [
+          ./modules/nixos/i3-wm.nix
           # No gaming, nvidia, etc. by default. Just core CLI and development tools.
         ];
         homeModules = [
