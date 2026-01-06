@@ -9,5 +9,5 @@ in
   };
 
   # Symlink the entire ranger-config directory to ~/.config/ranger
-  xdg.configFile."ranger".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/cli/ranger-config";
+  #xdg.configFile."ranger".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/cli/ranger-config";
 }
