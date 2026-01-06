@@ -19,30 +19,21 @@ in
 
   programs.rofi = {
     enable = true;
-    theme = "rounded-nord-dark"; # Set default theme
-
-    # extraThemes allows us to add custom themes (like power-profiles.rasi)
-    # The key is the theme name, and the value is the content.
-    extraThemes = {
-      # The base theme
-      "rounded-nord-dark" = {
-        # Assuming rounded-nord-dark.rasi imports its template
-        "rounded-nord-dark.rasi" = builtins.readFile "${rofiThemesDir}/rounded-nord-dark.rasi";
-        "template/rounded-template.rasi" = builtins.readFile "${rofiThemesDir}/template/rounded-template.rasi";
-      };
-
-      # Specific Rofi mode themes
-      "power-profiles" = builtins.readFile "${rofiConfigDir}/power-profiles.rasi";
-      "powermenu" = builtins.readFile "${rofiConfigDir}/powermenu.rasi";
-      "rofidmenu" = builtins.readFile "${rofiConfigDir}/rofidmenu.rasi";
-      "rofikeyhint" = builtins.readFile "${rofiConfigDir}/rofikeyhint.rasi";
-    };
-
-    # Any extra configuration for programs.rofi
-    # This might be needed if you had configurations outside of theme files.
-    # extraConfig = {};
+    theme = "rounded-nord-dark"; 
   };
 
-  # Remove the explicit home.file entries as extraThemes now handles them
-  # No longer need xdg.configFile for rofi-config, as extraThemes handles the .rasi files.
+  # Install Rofi themes and custom configs into ~/.local/share/rofi/themes
+  # Rofi looks here for themes, so our custom .rasi files will be found by name.
+  
+  # Base Theme
+  xdg.dataFile."rofi/themes/rounded-nord-dark.rasi".source = "${rofiThemesDir}/rounded-nord-dark.rasi";
+  xdg.dataFile."rofi/themes/template/rounded-template.rasi".source = "${rofiThemesDir}/template/rounded-template.rasi";
+
+  # Custom "Themes" (Modes)
+  # These are technically config files, but since we treat them as themes to be loaded with -theme,
+  # putting them in the themes directory is the cleanest way to make them discoverable without full path.
+  xdg.dataFile."rofi/themes/power-profiles.rasi".source = "${rofiConfigDir}/power-profiles.rasi";
+  xdg.dataFile."rofi/themes/powermenu.rasi".source = "${rofiConfigDir}/powermenu.rasi";
+  xdg.dataFile."rofi/themes/rofidmenu.rasi".source = "${rofiConfigDir}/rofidmenu.rasi";
+  xdg.dataFile."rofi/themes/rofikeyhint.rasi".source = "${rofiConfigDir}/rofikeyhint.rasi";
 }
