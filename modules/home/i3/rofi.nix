@@ -5,11 +5,9 @@ let
 in
 
 {
-  programs.rofi = {
-    enable = true;
-    # We don't set a global theme here because we use multiple per-mode themes.
-    # The default config.rasi will be generated, but specific launches will override it.
-  };
+  # We manage configuration manually via symlink, so we don't use the module's config generation.
+  # We just install the package.
+  home.packages = [ pkgs.rofi ];
 
   # Direct symlink to allow editing rofi configs in place
   xdg.configFile."rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/i3/rofi-config";
