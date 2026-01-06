@@ -95,6 +95,9 @@
   
   # Enable dconf for Home Manager to work with GTK settings
   programs.dconf.enable = true;
+
+  # Ensure zsh is in /etc/shells
+  environment.shells = with pkgs; [ zsh ];
   
   system.stateVersion = "25.11"; # Did you read the comment?
 

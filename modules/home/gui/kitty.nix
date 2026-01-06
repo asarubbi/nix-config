@@ -10,7 +10,6 @@
       enable_audio_bell = false;
       update_check_interval = 0;
       macos_option_as_alt = "both";
-      shell = "zsh";
     };
     shellIntegration.enableZshIntegration = true;
   };
