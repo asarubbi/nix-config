@@ -1,79 +1,127 @@
 {
-  description = "NixOS Flake - PC0 VM";
+  description = "NixOS Flake - Multi-System Config";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager,  ... }@inputs: { 
-    nixosConfigurations.pc0 = nixpkgs.lib.nixosSystem {
-      system = { inherit inputs;  };
-      specialArgs = { inherit inputs;  };
-      modules = [
-        ./hosts/pc0/configuration.nix
-        ./system/plasma6.nix
-        home-manager.nixosModules.home-manager {
-          home-manager.extraSpecialArgs = {
-            username = "adsbvm";
-            homeDirectory = "/home/adsbvm";
-          };
-          home-manager.users.adsbvm = import ./modules/home/common.nix;
-        }
-      ];
-    };
+  outputs = { self, nixpkgs, home-manager, nix-darwin, ... }@inputs: 
+  let 
+    # --- Helper Functions ---
 
-  
-    nixosConfigurations.pc1 = nixpkgs.lib.nixosSystem {
-      system = { inherit inputs;  };
-      specialArgs = { inherit inputs;  };
-      modules = [
-        ./hosts/pc0/configuration.nix
-        ./system/i3-wm.nix
-        home-manager.nixosModules.home-manager {
-          home-manager.extraSpecialArgs = {
-            username = "adsbvm";
-            homeDirectory = "/home/adsbvm";
-          };
-          home-manager.users.adsbvm = import ./modules/home/common.nix;
-        }
-      ];
-    };
-
-    nixosConfigurations.pc2 = nixpkgs.lib.nixosSystem {
-      system = { inherit inputs;  };
-      specialArgs = { inherit inputs;  };
-      modules = [
-        ./hosts/pc0/configuration.nix
-        ./system/gnome.nix
-        home-manager.nixosModules.home-manager {
-          home-manager.extraSpecialArgs = {
-            username = "adsbvm";
-            homeDirectory = "/home/adsbvm";
-          };
-          home-manager.users.adsbvm = import ./modules/home/common.nix;
-        }
-      ];
-    };
-
-    homeConfigurations."adsbvm" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.x86_64-linux; # Mint is 64-bit Linux
-      extraSpecialArgs = { 
-        inherit inputs; 
-        username = "adsbvm";
-        homeDirectory = "/home/adsbvm";
+    # Helper for creating NixOS configurations
+    mkNixos = { hostname, username, system ? "x86_64-linux", modules ? [] }: 
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/${hostname}/configuration.nix
+          home-manager.nixosModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+              inherit username;
+              homeDirectory = "/home/${username}";
+            };
+            home-manager.users.${username} = {
+              imports = [ 
+                ./modules/home/core.nix
+                ./modules/home/cli/default.nix
+                ./modules/home/gui/default.nix
+              ];
+            };
+          }
+        ] ++ modules;
       };
-      modules = [
-        ./modules/home/common.nix # Your shared Zsh, Neovim, etc.
-        {
-          home = {
-            username = "adsbvm";
-            homeDirectory = "/home/adsbvm";
-            stateVersion = "25.11";
-          };
-        }
-      ];
+
+    # Helper for creating macOS (Darwin) configurations
+    mkDarwin = { username, system ? "aarch64-darwin", modules ? [] }:
+      nix-darwin.lib.darwinSystem {
+        inherit system;
+        modules = [
+          ./modules/darwin/base.nix
+          home-manager.darwinModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+              inherit username;
+              homeDirectory = "/Users/${username}";
+            };
+            home-manager.users.${username} = {
+              imports = [
+                ./modules/home/core.nix
+                ./modules/home/cli/default.nix
+                ./modules/home/gui/default.nix 
+              ];
+            };
+          }
+        ] ++ modules;
+      };
+
+    # Helper for creating Standalone Home Manager configurations
+    mkHome = { username, sys ? "x86_64-linux", modules ? [] }: 
+      home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.${sys};
+        extraSpecialArgs = { 
+          inherit inputs; 
+          inherit username;
+          homeDirectory = "/home/${username}";
+        };
+        modules = [
+          ./modules/home/core.nix
+          ./modules/home/cli/default.nix
+        ] ++ modules;
+      };
+
+  in { 
+    
+    # --- NixOS Hosts ---
+    nixosConfigurations = {
+      
+      # PC0: Base Plasma
+      pc0 = mkNixos {
+        hostname = "pc0";
+        username = "adsbvm";
+        modules = [ ./modules/nixos/plasma6.nix ];
+      };
+
+      # PC1: i3 Window Manager
+      pc1 = mkNixos {
+        hostname = "pc0"; # Reusing pc0 hardware config for demo
+        username = "adsbvm";
+        modules = [ ./modules/nixos/i3-wm.nix ];
+      };
+
+      # PC2: GNOME
+      pc2 = mkNixos {
+        hostname = "pc0"; # Reusing pc0 hardware config for demo
+        username = "otheruser"; # Example of different user
+        modules = [ ./modules/nixos/gnome.nix ];
+      };
+    };
+
+    # --- macOS Hosts ---
+    darwinConfigurations = {
+      "macbook" = mkDarwin {
+        username = "alex"; # Example mac user
+      };
+    };
+
+    # --- Standalone Home Manager ---
+    homeConfigurations = {
+      "mintuser" = mkHome {
+        username = "mintuser";
+        sys = "x86_64-linux";
+        modules = [ ./modules/home/gui/default.nix ];
+      };
     };
 
   };

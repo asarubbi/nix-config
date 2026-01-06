@@ -31,6 +31,6 @@ in
     ];
   };
 
-  xdg.configFile.nvim.source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/nvim-config";
+  xdg.configFile.nvim.source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/cli/nvim-config";
 
 }
