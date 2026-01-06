@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -29,6 +29,8 @@
   
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  
+  services.displayManager.sddm.enable = lib.mkForce false;
   
   system.stateVersion = "25.11"; 
 }
