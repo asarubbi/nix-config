@@ -9,7 +9,7 @@
 
   # Basic system settings
   networking.hostName = "devbox";
-  users.users.devuser = {
+  users.users.adsbvm = {
     isNormalUser = true;
     shell = pkgs.zsh;
     extraGroups = [ "wheel" ];

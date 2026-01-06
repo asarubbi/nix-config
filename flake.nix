@@ -106,7 +106,7 @@
       # devbox: Minimal development environment
       devbox = mkNixos {
         hostname = "devbox";
-        username = "devuser"; # A new user for the devbox
+        username = "adsbvm"; # A new user for the devbox
         modules = [
           # No gaming, nvidia, etc. by default. Just core CLI and development tools.
         ];
