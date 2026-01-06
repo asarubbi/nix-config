@@ -28,7 +28,7 @@
             home-manager.extraSpecialArgs = {
               inherit inputs;
               inherit username;
-              homeDirectory = "/home/${username}";
+              # homeDirectory is now automatically derived from the NixOS user configuration
             };
             home-manager.users.${username} = {
               imports = homeModules;

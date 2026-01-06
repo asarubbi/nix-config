@@ -11,6 +11,7 @@
   networking.hostName = "devbox";
   users.users.adsbvm = {
     isNormalUser = true;
+    home = "/home/adsbvm";
     shell = pkgs.zsh;
     extraGroups = [ "wheel" ];
   };
