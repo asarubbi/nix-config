@@ -1,0 +1,35 @@
+include config.base
+
+# Workspace outputs for Titan (Dual Monitor)
+workspace $ws1 output HDMI-0
+workspace $ws2 output HDMI-0
+workspace $ws3 output HDMI-0
+workspace $ws4 output HDMI-0
+workspace $ws5 output HDMI-0
+workspace $ws6 output HDMI-0
+workspace $ws7 output HDMI-0
+workspace $ws8 output HDMI-0
+workspace $ws9 output DP-2
+
+# Monitor layout script
+exec --no-startup-id ~/.screenlayout/monitor.sh
+
+# Bar configuration for Titan
+bar {
+  font pango:DejaVu Sans Mono, Font Awesome 6 Free Solid 14
+	status_command i3blocks -c ~/.config/i3/i3blocks.conf
+	position top
+  output HDMI-0
+  tray_padding 0
+  strip_workspace_numbers yes
+
+  colors {
+    separator          $purple
+    background         $darkgrey
+    statusline         $white
+    focused_workspace	$mediumgrey	   	$grey		$darkgrey	$purple
+    active_workspace	$lightblue      	$mediumgrey	$darkgrey	$purple
+    inactive_workspace	$darkgrey   		$darkgrey	$grey		$purple
+    urgent_workspace	$urgentred	    	$urgentred	$white		$purple
+  }
+}
