@@ -99,6 +99,9 @@
 
   # Ensure zsh is in /etc/shells
   environment.shells = with pkgs; [ zsh ];
+
+  # Enable zsh programs for NixOS
+  programs.zsh.enable = true;
   
   system.stateVersion = "25.11"; # Did you read the comment?
 
