@@ -1,1 +1,29 @@
-temp
+# nix-config
+.direnv/
+
+# Editor-specific files
+.idea/
+.vscode/
+
+# Build artifacts
+result/
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Nix-specific ignore
+.nix-profile
+.cache/
+.local/
+.state/
+
+# Secrets or sensitive data
+secrets/
+
+# Example configurations
+examples/
