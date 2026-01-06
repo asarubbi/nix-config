@@ -113,7 +113,7 @@
         homeModules = [
           ./modules/home/core.nix
           ./modules/home/cli/default.nix
-          ./modules/home/gui/default.nix
+          ./modules/home/gui/core.nix
           ./modules/home/i3/default.nix
         ];
       };
