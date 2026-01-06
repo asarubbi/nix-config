@@ -3,78 +3,48 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-darwin, ... }@inputs: 
+  outputs = { self, nixpkgs, nix-darwin, ... }@inputs: 
   let 
+    systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+    packageSetsFor = system: import ./modules/common/packages.nix {
+      pkgs = nixpkgs.legacyPackages.${system};
+    };
+    profilePackagesFor = system: profile: (packageSetsFor system).profiles.${profile};
+
     # --- Helper Functions ---
 
     # Helper for creating NixOS configurations
-    mkNixos = { hostname, username, system ? "x86_64-linux", modules ? [], homeModules ? [] }: 
+    mkNixos = { hostname, username, profile, system ? "x86_64-linux", modules ? [] }: 
       nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = {
+          inherit inputs;
+          profilePackages = profilePackagesFor system profile;
+          profileFonts = (packageSetsFor system).fonts;
+        };
         modules = [
           ./hosts/${hostname}/configuration.nix
-          home-manager.nixosModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-              inherit username;
-              # homeDirectory is now automatically derived from the NixOS user configuration
-            };
-            home-manager.users.${username} = {
-              imports = homeModules;
-            };
-          }
+          ./modules/nixos/packages.nix
         ] ++ modules;
       };
 
     # Helper for creating macOS (Darwin) configurations
-    mkDarwin = { username, system ? "aarch64-darwin", modules ? [] }:
+    mkDarwin = { username, profile, system ? "aarch64-darwin", modules ? [] }:
       nix-darwin.lib.darwinSystem {
         inherit system;
         modules = [
           ./modules/darwin/base.nix
-          home-manager.darwinModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-              inherit username;
-              homeDirectory = "/Users/${username}";
-            };
-            home-manager.users.${username} = {
-              imports = [
-                ./modules/home/core.nix
-                ./modules/home/cli/default.nix
-                ./modules/home/gui/default.nix 
-              ];
-            };
-          }
+          ./modules/darwin/packages.nix
         ] ++ modules;
-      };
-
-    # Helper for creating Standalone Home Manager configurations
-    mkHome = { username, sys ? "x86_64-linux", modules ? [] }: 
-      home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${sys};
-        extraSpecialArgs = { 
-          inherit inputs; 
-          inherit username;
-          homeDirectory = "/home/${username}";
+        specialArgs = {
+          profilePackages = profilePackagesFor system profile;
+          profileFonts = (packageSetsFor system).fonts;
         };
-        modules = [
-          ./modules/home/core.nix
-          ./modules/home/cli/default.nix
-        ] ++ modules;
       };
 
   in { 
@@ -86,6 +56,7 @@
       titan = mkNixos {
         hostname = "DARK-PORTAL";
         username = "asarubbi"; # Corrected username
+        profile = "titan";
         modules = [
           ./modules/nixos/i3-wm.nix
           ./modules/nixos/nvidia.nix
@@ -95,27 +66,16 @@
           ./modules/nixos/1password.nix
           ./modules/nixos/zsa-keyboards.nix
         ];
-        homeModules = [
-          ./modules/home/core.nix
-          ./modules/home/cli/default.nix
-          ./modules/home/gui/default.nix
-          ./modules/home/i3/default.nix
-        ];
       };
 
       # devbox: Minimal development environment
       devbox = mkNixos {
         hostname = "devbox";
         username = "adsbvm"; # A new user for the devbox
+        profile = "devbox";
         modules = [
           ./modules/nixos/i3-wm.nix
           # No gaming, nvidia, etc. by default. Just core CLI and development tools.
-        ];
-        homeModules = [
-          ./modules/home/core.nix
-          ./modules/home/cli/default.nix
-          ./modules/home/gui/core.nix
-          ./modules/home/i3/default.nix
         ];
       };
     };
@@ -124,19 +84,33 @@
     darwinConfigurations = {
       "macbook" = mkDarwin {
         username = "alex"; # Example mac user
+        profile = "dev";
       };
     };
 
-    # --- Standalone Home Manager ---
-    homeConfigurations = {
-    homeConfigurations."genericuser" = mkHome {
-      username = "genericuser";
-      sys = "x86_64-linux";
-      modules = [
-        ./modules/home/gui/default.nix
-      ];
-    };
-    };
+    # --- Shared package/devshell outputs for non-NixOS usage ---
+    packages = nixpkgs.lib.genAttrs systems (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        sets = packageSetsFor system;
+      in nixpkgs.lib.mapAttrs (name: paths:
+        pkgs.buildEnv {
+          name = "${name}-packages";
+          paths = paths;
+        }
+      ) sets.profiles);
 
+    devShells = nixpkgs.lib.genAttrs systems (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        sets = packageSetsFor system;
+        mkShellFor = paths: pkgs.mkShell { packages = paths; };
+        shellProfiles = {
+          dev = sets.profiles.dev;
+          desktop = sets.profiles.desktop;
+        };
+      in nixpkgs.lib.mapAttrs (name: paths: mkShellFor paths) shellProfiles // {
+        default = mkShellFor sets.profiles.dev;
+      });
   };
 }
