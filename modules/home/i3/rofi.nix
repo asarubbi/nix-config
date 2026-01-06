@@ -6,8 +6,16 @@ in
 
 {
   # We manage configuration manually via symlink, so we don't use the module's config generation.
-  # We just install the package.
-  home.packages = [ pkgs.rofi ];
+  # We install the package with plugins explicitly.
+  home.packages = with pkgs; [
+    (rofi.override {
+      plugins = [
+        rofi-emoji
+        rofi-calc
+        rofi-pulse-select
+      ];
+    })
+  ];
 
   # Direct symlink to allow editing rofi configs in place
   xdg.configFile."rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/i3/rofi-config";

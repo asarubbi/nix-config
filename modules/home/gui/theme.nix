@@ -19,16 +19,6 @@
     gtk.enable = true;
   };
 
-  programs.rofi = {
-    enable = true;
-    theme = "rounded-nord-dark";
-    plugins = with pkgs; [
-      rofi-emoji
-      rofi-calc
-      rofi-pulse-select
-    ];
-  };
-
   # Extra theming / appearance packages
   home.packages = with pkgs; [
     dunst
