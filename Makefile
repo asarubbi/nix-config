@@ -1,8 +1,7 @@
 # NixOS / Nix-Darwin / Home-Manager Makefile
 
 # --- Variables ---
-HOST_NIXOS ?= titan
-HOST_DARWIN ?= macbook
+HOST ?= titan
 USER ?= genericuser
 
 # --- Main Targets ---
@@ -11,8 +10,8 @@ USER ?= genericuser
 
 all:
 	@echo "Usage: make [target]"
-	@echo "  nixos HOST=<hostname>    - Rebuild NixOS configuration (default: $(HOST_NIXOS))"
-	@echo "  darwin HOST=<hostname>   - Rebuild macOS configuration (default: $(HOST_DARWIN))"
+	@echo "  nixos HOST=<hostname>    - Rebuild NixOS configuration (default: $(HOST))"
+	@echo "  darwin HOST=<hostname>   - Rebuild macOS configuration (default: $(HOST))"
 	@echo "  home USER=<username>     - Rebuild Home Manager configuration (default: $(USER))"
 	@echo "  update                   - Update flake.lock"
 	@echo "  clean                    - Garbage collect old generations"
@@ -20,11 +19,11 @@ all:
 
 # NixOS Rebuild
 nixos:
-	sudo nixos-rebuild switch --flake .#$(HOST_NIXOS)
+	sudo nixos-rebuild switch --flake .#$(HOST)
 
 # macOS Rebuild (Darwin)
 darwin:
-	darwin-rebuild switch --flake .#$(HOST_DARWIN)
+	darwin-rebuild switch --flake .#$(HOST)
 
 # Home Manager Rebuild (Standalone)
 home:
