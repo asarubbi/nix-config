@@ -3,7 +3,7 @@
 # --- Variables ---
 HOST_NIXOS ?= titan
 HOST_DARWIN ?= macbook
-USER_HOME ?= genericuser
+USER ?= genericuser
 
 # --- Main Targets ---
 
@@ -13,7 +13,7 @@ all:
 	@echo "Usage: make [target]"
 	@echo "  nixos HOST=<hostname>    - Rebuild NixOS configuration (default: $(HOST_NIXOS))"
 	@echo "  darwin HOST=<hostname>   - Rebuild macOS configuration (default: $(HOST_DARWIN))"
-	@echo "  home USER=<username>     - Rebuild Home Manager configuration (default: $(USER_HOME))"
+	@echo "  home USER=<username>     - Rebuild Home Manager configuration (default: $(USER))"
 	@echo "  update                   - Update flake.lock"
 	@echo "  clean                    - Garbage collect old generations"
 	@echo "  history                  - Show generation history"
@@ -28,7 +28,7 @@ darwin:
 
 # Home Manager Rebuild (Standalone)
 home:
-	home-manager switch --flake .#$(USER_HOME)
+	home-manager switch --flake .#$(USER)
 
 # Update Flake Inputs
 update:
