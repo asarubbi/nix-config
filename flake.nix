@@ -16,7 +16,7 @@
     # --- Helper Functions ---
 
     # Helper for creating NixOS configurations
-    mkNixos = { hostname, username, system ? "x86_64-linux", modules ? [] }: 
+    mkNixos = { hostname, username, system ? "x86_64-linux", modules ? [], homeModules ? [] }: 
       nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
@@ -31,11 +31,7 @@
               homeDirectory = "/home/${username}";
             };
             home-manager.users.${username} = {
-              imports = [ 
-                ./modules/home/core.nix
-                ./modules/home/cli/default.nix
-                ./modules/home/gui/default.nix
-              ];
+              imports = homeModules;
             };
           }
         ] ++ modules;
@@ -86,25 +82,40 @@
     # --- NixOS Hosts ---
     nixosConfigurations = {
       
-      # PC0: Base Plasma
-      pc0 = mkNixos {
-        hostname = "pc0";
-        username = "adsbvm";
-        modules = [ ./modules/nixos/plasma6.nix ];
+      # titan: i3 Window Manager
+      titan = mkNixos {
+        hostname = "DARK-PORTAL";
+        username = "asarubbi"; # Corrected username
+        modules = [
+          ./modules/nixos/i3-wm.nix
+          ./modules/nixos/nvidia.nix
+          ./modules/nixos/gaming.nix
+          ./modules/nixos/virtualization.nix
+          ./modules/nixos/printing.nix
+          ./modules/nixos/1password.nix
+          ./modules/nixos/zsa-keyboards.nix
+        ];
+        homeModules = [
+          ./modules/home/core.nix
+          ./modules/home/cli/default.nix
+          ./modules/home/gui/default.nix
+          ./modules/home/i3/default.nix
+        ];
       };
 
-      # PC1: i3 Window Manager
-      pc1 = mkNixos {
-        hostname = "pc0"; # Reusing pc0 hardware config for demo
-        username = "adsbvm";
-        modules = [ ./modules/nixos/i3-wm.nix ];
-      };
-
-      # PC2: GNOME
-      pc2 = mkNixos {
-        hostname = "pc0"; # Reusing pc0 hardware config for demo
-        username = "otheruser"; # Example of different user
-        modules = [ ./modules/nixos/gnome.nix ];
+      # devbox: Minimal development environment
+      devbox = mkNixos {
+        hostname = "devbox";
+        username = "devuser"; # A new user for the devbox
+        modules = [
+          # No gaming, nvidia, etc. by default. Just core CLI and development tools.
+        ];
+        homeModules = [
+          ./modules/home/core.nix
+          ./modules/home/cli/default.nix
+          ./modules/home/gui/default.nix
+          ./modules/home/i3/default.nix
+        ];
       };
     };
 
@@ -117,11 +128,13 @@
 
     # --- Standalone Home Manager ---
     homeConfigurations = {
-      "mintuser" = mkHome {
-        username = "mintuser";
-        sys = "x86_64-linux";
-        modules = [ ./modules/home/gui/default.nix ];
-      };
+    homeConfigurations."genericuser" = mkHome {
+      username = "genericuser";
+      sys = "x86_64-linux";
+      modules = [
+        ./modules/home/gui/default.nix
+      ];
+    };
     };
 
   };

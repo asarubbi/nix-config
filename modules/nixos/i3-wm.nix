@@ -1,7 +1,11 @@
-{ pkgs, ...}: {
+{ pkgs, ... }: {
+
   services.xserver = {
     enable = true;
-    desktopManager.xterm.enable = false;
+    
+    desktopManager = {
+      xterm.enable = false;
+    };
 
     displayManager = {
       lightdm.enable = true;
@@ -14,8 +18,22 @@
         dmenu
         i3status
         i3lock
-        picom
+        i3blocks
       ];
+    };
+  };
+
+  # Picom (Compositor)
+  services.picom = {
+    enable = true;
+    fade = true;
+    shadow = true;
+    settings = {
+       blur = {
+         method = "gaussian";
+         size = 10;
+         deviation = 5.0;
+       };
     };
   };
 }

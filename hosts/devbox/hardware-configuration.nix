@@ -1,0 +1,1 @@
+{ ... }: { /* hardware config goes here */ }
