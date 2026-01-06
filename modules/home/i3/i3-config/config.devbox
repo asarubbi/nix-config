@@ -1,5 +1,18 @@
 include config.base
 
+# Define colors variables (copied from config.base to ensure scope availability in bar block)
+set $darkbluetrans	#08052be6
+set $darkblue		#08052b
+set $lightblue		#5294e2
+set $urgentred		#e53935
+set $white		#ffffff
+set $black		#000000
+set $purple		#e345ff
+set $darkgrey		#383c4a
+set $grey		#b0b5bd
+set $mediumgrey		#8b8b8b
+set $yellowbrown	#e1b700
+
 # Workspace outputs for Devbox (Single Monitor)
 # Assuming typical primary output names like eDP-1, Virtual-1, or just let i3 decide.
 # For a generic devbox, we often don't bind to specific outputs or just bind to primary.
