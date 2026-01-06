@@ -2,7 +2,7 @@
 
 let
   dotfilesDir = "${config.home.homeDirectory}/nix-config";
-  host = osConfig.networking.hostName;
+  host = "devbox"; # Hardcoded for debugging
 in
 {
   # We assume i3 is installed system-wide via NixOS module (modules/nixos/i3-wm.nix)
