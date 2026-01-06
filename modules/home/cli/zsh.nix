@@ -54,9 +54,9 @@
     };
   };
 
-  home.shell = pkgs.zsh;
 
   home.packages = with pkgs; [
+    zsh
     zoxide
     fzf
   ];
