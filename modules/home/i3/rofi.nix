@@ -7,19 +7,14 @@ let
 in
 
 {
-  home.packages = with pkgs; [
-    (rofi.override {
-      plugins = [
-        rofi-emoji
-        rofi-calc
-        rofi-pulse-select
-      ];
-    })
-  ];
-
   programs.rofi = {
     enable = true;
     theme = "rounded-nord-dark"; 
+    plugins = with pkgs; [
+      rofi-emoji
+      rofi-calc
+      rofi-pulse-select
+    ];
   };
 
   # Install Rofi themes and custom configs into ~/.local/share/rofi/themes
