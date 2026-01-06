@@ -45,5 +45,7 @@
     neofetch
     cmatrix
     asciinema
+
+    zsh
   ];
 }

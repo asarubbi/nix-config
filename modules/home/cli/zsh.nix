@@ -56,7 +56,6 @@
 
 
   home.packages = with pkgs; [
-    zsh
     zoxide
     fzf
   ];
