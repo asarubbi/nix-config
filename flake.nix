@@ -59,7 +59,11 @@
 
     homeConfigurations."adsbvm" = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages.x86_64-linux; # Mint is 64-bit Linux
-      extraSpecialArgs = { inherit inputs; };
+      extraSpecialArgs = { 
+        inherit inputs; 
+        username = "adsbvm";
+        homeDirectory = "/home/adsbvm";
+      };
       modules = [
         ./modules/home/common.nix # Your shared Zsh, Neovim, etc.
         {
