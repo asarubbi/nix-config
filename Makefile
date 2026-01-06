@@ -19,7 +19,7 @@ all:
 
 # NixOS Rebuild
 nixos:
-	sudo nixos-rebuild switch --flake .#$(HOST)
+	sudo nixos-rebuild switch --flake .#$(HOST) --impure
 
 # macOS Rebuild (Darwin)
 darwin:
