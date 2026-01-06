@@ -13,7 +13,7 @@ configuration {
     sidebar-mode:     false;
 }
 
-@import "~/.config/rofi/config.rasi"
+@import "rounded-nord-dark.rasi"
 /* Insert theme modifications after this */
 
 

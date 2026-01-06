@@ -1,12 +1,12 @@
-{ config, pkgs, ... }: # Added config to arguments
+{ config, pkgs, ... }:
 
 let
   dotfilesDir = "${config.home.homeDirectory}/nix-config";
+  rofiConfigDir = "${dotfilesDir}/modules/home/i3/rofi-config";
+  rofiThemesDir = "${dotfilesDir}/modules/home/i3/rofi-themes";
 in
 
 {
-  # We manage configuration manually via symlink, so we don't use the module's config generation.
-  # We install the package with plugins explicitly.
   home.packages = with pkgs; [
     (rofi.override {
       plugins = [
@@ -17,10 +17,32 @@ in
     })
   ];
 
-  # Direct symlink to allow editing rofi configs in place
-  xdg.configFile."rofi".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/modules/home/i3/rofi-config";
+  programs.rofi = {
+    enable = true;
+    theme = "rounded-nord-dark"; # Set default theme
 
-  # Install custom Rofi themes to ~/.local/share/rofi/themes/
-  home.file.".local/share/rofi/themes/rounded-nord-dark.rasi".source = "${dotfilesDir}/modules/home/i3/rofi-themes/rounded-nord-dark.rasi";
-  home.file.".local/share/rofi/themes/template/rounded-template.rasi".source = "${dotfilesDir}/modules/home/i3/rofi-themes/template/rounded-template.rasi";
+    # extraThemes allows us to add custom themes (like power-profiles.rasi)
+    # The key is the theme name, and the value is the content.
+    extraThemes = {
+      # The base theme
+      "rounded-nord-dark" = {
+        # Assuming rounded-nord-dark.rasi imports its template
+        "rounded-nord-dark.rasi" = builtins.readFile "${rofiThemesDir}/rounded-nord-dark.rasi";
+        "template/rounded-template.rasi" = builtins.readFile "${rofiThemesDir}/template/rounded-template.rasi";
+      };
+
+      # Specific Rofi mode themes
+      "power-profiles" = builtins.readFile "${rofiConfigDir}/power-profiles.rasi";
+      "powermenu" = builtins.readFile "${rofiConfigDir}/powermenu.rasi";
+      "rofidmenu" = builtins.readFile "${rofiConfigDir}/rofidmenu.rasi";
+      "rofikeyhint" = builtins.readFile "${rofiConfigDir}/rofikeyhint.rasi";
+    };
+
+    # Any extra configuration for programs.rofi
+    # This might be needed if you had configurations outside of theme files.
+    # extraConfig = {};
+  };
+
+  # Remove the explicit home.file entries as extraThemes now handles them
+  # No longer need xdg.configFile for rofi-config, as extraThemes handles the .rasi files.
 }
