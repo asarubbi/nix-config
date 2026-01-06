@@ -49,8 +49,15 @@
   programs.starship = {
     enable = true;
     settings = {
-      add_newline = false;
-      line_break.disable = true;
+      add_newline = true;
+
+      character = {
+        success_symbol = "[➜](bold green)";
+      };
+
+      package.disabled = true;
+
+      time.disabled = true;
     };
   };
 

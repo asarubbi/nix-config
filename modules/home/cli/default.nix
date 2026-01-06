@@ -3,6 +3,7 @@
     ./neovim.nix
     ./tmux.nix
     ./zsh.nix
+    ./ranger.nix
   ];
 
   home.packages = with pkgs; [
