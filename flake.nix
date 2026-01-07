@@ -11,8 +11,12 @@
   outputs = { self, nixpkgs, nix-darwin, ... }@inputs: 
   let 
     systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+    pkgsFor = system: import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
     packageSetsFor = system: import ./modules/common/packages.nix {
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = pkgsFor system;
     };
     profilePackagesFor = system: profile: (packageSetsFor system).profiles.${profile};
 
@@ -29,6 +33,7 @@
         };
         modules = [
           ./hosts/${hostname}/configuration.nix
+          { nixpkgs.config.allowUnfree = true; }
           ./modules/nixos/packages.nix
         ] ++ modules;
       };
@@ -38,6 +43,7 @@
       nix-darwin.lib.darwinSystem {
         inherit system;
         modules = [
+          { nixpkgs.config.allowUnfree = true; }
           ./modules/darwin/base.nix
           ./modules/darwin/packages.nix
         ] ++ modules;
@@ -91,7 +97,7 @@
     # --- Shared package/devshell outputs for non-NixOS usage ---
     packages = nixpkgs.lib.genAttrs systems (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = pkgsFor system;
         sets = packageSetsFor system;
       in nixpkgs.lib.mapAttrs (name: paths:
         pkgs.buildEnv {
@@ -102,7 +108,7 @@
 
     devShells = nixpkgs.lib.genAttrs systems (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = pkgsFor system;
         sets = packageSetsFor system;
         mkShellFor = paths: pkgs.mkShell { packages = paths; };
         shellProfiles = {
