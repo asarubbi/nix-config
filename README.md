@@ -8,6 +8,9 @@ What’s included:
 - macOS modules under `modules/darwin` with `modules/darwin/packages.nix` for the same profile + fonts.
 - Flake outputs for dev shells and pre-built package profiles (`packages.<system>.<profile>`, `devShells.<system>.<profile>`) usable on any machine with Nix.
 
+Dotfiles (stow):
+- Dotfiles are managed out-of-band (e.g., your own repo + Stow). Nothing here manages them via Nix.
+
 Build examples:
 - NixOS: `sudo nixos-rebuild switch --flake .#titan` (uses the `titan` profile)
 - macOS: `darwin-rebuild switch --flake .#macbook`

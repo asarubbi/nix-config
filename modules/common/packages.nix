@@ -62,6 +62,7 @@ let
     xscreensaver
     xorg.xkill
     rofi
+    rofi-power-menu
     rofi-emoji
     rofi-calc
     rofi-pulse-select
