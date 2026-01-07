@@ -98,6 +98,8 @@ let
   ];
 
   i3Extras = lib.optionals isLinux (with pkgs; [
+    i3
+    dmenu
     autotiling
     i3status
     i3blocks
