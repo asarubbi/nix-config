@@ -1,16 +1,8 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-      ../../modules/nixos/nvidia.nix
-      ../../modules/nixos/virtualization.nix
-      ../../modules/nixos/gaming.nix
-      ../../modules/nixos/printing.nix
-      ../../modules/nixos/1password.nix
-      ../../modules/nixos/zsa-keyboards.nix
-    ];
+  # Flake already injects the shared NixOS modules; only keep the host hardware scan here.
+  imports = [ ./hardware-configuration.nix ];
 
   # Mount points
   fileSystems."/mnt/gameland" = {

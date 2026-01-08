@@ -126,13 +126,44 @@ let
     win-spice
   ]);
 
+  portable = with pkgs; [
+    git
+    gh
+    lazygit
+    stow
+    btop
+    fzf
+    ripgrep
+    fd
+    jq
+    tldr
+    tree
+    wget
+    curl
+    unzip
+    zip
+    python3
+    gcc
+    gnumake
+    pkg-config
+    zsh
+    tmux
+    zoxide
+    starship
+    neovim
+    direnv
+    nix-direnv
+  ] ++ lib.optionals isLinux [
+    xclip
+  ];
+
   dev = cli;
   desktop = dev ++ guiCore ++ guiApps ++ i3Extras ++ fonts;
   titan = desktop ++ gaming ++ virtualization;
   devbox = desktop;
 in {
-  inherit cli dev desktop titan devbox guiCore guiApps fonts i3Extras gaming virtualization;
+  inherit cli dev desktop titan devbox portable guiCore guiApps fonts i3Extras gaming virtualization;
   profiles = {
-    inherit dev desktop titan devbox;
+    inherit dev desktop titan devbox portable;
   };
 }

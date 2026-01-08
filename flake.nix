@@ -114,6 +114,7 @@
         shellProfiles = {
           dev = sets.profiles.dev;
           desktop = sets.profiles.desktop;
+          portable = sets.profiles.portable;
         };
       in nixpkgs.lib.mapAttrs (name: paths: mkShellFor paths) shellProfiles // {
         default = mkShellFor sets.profiles.dev;
